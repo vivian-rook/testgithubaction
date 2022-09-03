@@ -4,7 +4,7 @@ name: "test open and close pr"
 
 'on':
   pull_request:
-  #pull_request: [opened, closed]
+    types: [opened, closed]
 
 #on: [push, pull_request, create, closed]
 
@@ -30,8 +30,9 @@ jobs:
       - name: close
         run: |
           echo 2
-        if: github.event.pull_request.merged == true
-        #if: github.event.action == 'closed'
+        #if: github.event.pull_request.merged == true
+        #if: github.event.pull_request.merged == true
+        if: github.event.action == 'closed'
 #          ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
 #          ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
 #jobs:
