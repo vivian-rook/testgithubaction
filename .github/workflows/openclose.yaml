@@ -4,9 +4,7 @@ name: "test open and close pr"
 
 'on':
   pull_request:
-  #pull_request: [opened, closed]
-
-#on: [push, pull_request, create, closed]
+    types: [opened, closed]
 
 jobs:
   notification:
@@ -18,11 +16,6 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "$GITHUB_CONTEXT"
-      #  run: |
-      #    echo ${{ github }}
-      - name: echo event action
-        run: |
-          echo ${{ github.event.action }}
       - name: open
         run: |
           echo 1
@@ -30,43 +23,4 @@ jobs:
       - name: close
         run: |
           echo 2
-        if: github.event.pull_request.merged == true
-        #if: github.event.action == 'closed'
-#          ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
-#          ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
-#jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: irc push
-#        uses: rectalogic/notify-irc@v2
-#        #if: github.event_name == 'create' && github.event.ref_type == ''
-#        #if: github.event_name == 'opened'
-#        with:
-#          channel: "Rook"
-#          server: "irc.libera.chat"
-#          port: 6667
-#          tls: false
-#          nickname: notificationfromgithub2345343
-#          message: |
-#            ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
-#            ${{ join(github.event.commits.*.message) }}
-#      - name: irc pull request
-#        uses: rectalogic/notify-irc@v2
-#        if: github.event_name == 'closed'
-#        with:
-#          channel: "Rook"
-#          server: "irc.libera.chat"
-#          nickname: my-github-notifier
-#          message: |
-#            ${{ github.actor }} opened PR ${{ github.event.pull_request.html_url }}
-#      - name: closed PR
-#        uses: rectalogic/notify-irc@v2
-#        if: github.event_name == 'closed'
-#        #if: github.event.pull_request.merged == true && github.event_name == 'closed'
-#        with:
-#          channel: "Rook"
-#          server: "irc.libera.chat"
-#          nickname: my-github-notifier
-#          message: |
-#            ${{ github.actor }} closed ${{ github.event.ref }} ${{ github.event.compare }}
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
