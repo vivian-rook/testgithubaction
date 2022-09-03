@@ -1,0 +1,15 @@
+on:
+  pull_request:
+    types: [closed]
+
+
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+    name: this should run when closed
+    steps:
+      - name: echo
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
