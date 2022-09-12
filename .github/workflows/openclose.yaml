@@ -4,7 +4,7 @@ name: "test open and close pr"
 
 'on':
   pull_request:
-    types: [opened, closed]
+#    types: [opened, closed]
 
 jobs:
   notification:
@@ -24,3 +24,23 @@ jobs:
         run: |
           echo 2
         if: github.event.action == 'closed' && github.event.pull_request.merged == true
+
+      - uses: actions/checkout@v2
+      - name: git log
+        run: |
+          git branch
+          git fetch
+          git branch 
+      - name: git log more
+        run: |
+          #git log
+          inital_commit=$(git log origin/main..origin/${{ github.head_ref }} --pretty=%H | tail -n1)
+          echo "this is an echo ${inital_commit}"
+          task=$(git log -n 1 ${inital_commit} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
+          if [ -n "${task}" ]; then
+            echo "found ${task}"
+          else
+            echo "it would appear that ${task} is empty"
+          fi
+          #git log origin/main..origin/get-from-git --pretty=%H | tail -n1
+
