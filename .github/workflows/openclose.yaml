@@ -24,3 +24,9 @@ jobs:
         run: |
           echo 2
         if: github.event.action == 'closed' && github.event.pull_request.merged == true
+
+      - uses: actions/checkout@v2
+      - name: git log
+        run: |
+          git log main..get-from-git --pretty=%b
+
