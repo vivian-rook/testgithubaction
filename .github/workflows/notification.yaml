@@ -30,6 +30,10 @@ jobs:
           task=$(git log -n 1 ${inital_commit} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
           echo "$task and $inital_commit done"
           echo "head ref ${{ github.head_ref }}"
+          # if already squashed and merged use the branch name.
+          if [ -z "${task}" ]; then
+            task=$(git log -n 1 ${{ github.head_ref }} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
+          fi
           if [ -n "${task}" ]; then
             curl https://phabricator.wikimedia.org/api/maniphest.edit \
                 -d api.token=${{ secrets.TOOLFORGE_PHAB_BOT_KEY }} \
