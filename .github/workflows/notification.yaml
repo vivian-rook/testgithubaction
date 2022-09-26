@@ -22,7 +22,10 @@ jobs:
     name: Comment on Phabricator
     steps:
       - uses: actions/checkout@v2
+      - name: Echo github obj
+        run: echo ${{ toJson(github) }}
       - name: post to phabricator
+
         run: |
           message="${{ github.actor }} ${{ github.event.action }} ${{ github.event.pull_request._links.html.href }}"
           git fetch
