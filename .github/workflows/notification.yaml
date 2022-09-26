@@ -29,7 +29,8 @@ jobs:
           #inital_commit=$(git log origin/main..origin/${{ github.head_ref }} --pretty=%H | tail -n1)
           #task=$(git log -n 1 ${inital_commit} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
           task=$(git log -n 1 origin/main..origin/${{ github.head_ref }} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
-          echo "$task done"
+          git log -n 1 origin/main..origin/${{ github.head_ref }} 
+          echo "$task done ${{ github.head_ref }}"
           #echo "$task and $inital_commit done"
           #echo "head ref ${{ github.head_ref }}"
           # if already squashed and merged use the branch name.
