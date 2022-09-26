@@ -4,9 +4,18 @@ name: "PR Notification"
 
 'on':
   pull_request:
-    types: [opened, closed]
+    #types: [opened, closed]
 
 jobs:
+  printJob:    
+    name: Print event
+    runs-on: ubuntu-latest
+    steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
 #  irc-notification:
 #    runs-on: ubuntu-latest
 #    name: Notify on IRC
@@ -23,6 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: post to phabricator
+
         run: |
           message="${{ github.actor }} ${{ github.event.action }} ${{ github.event.pull_request._links.html.href }}"
           git fetch
