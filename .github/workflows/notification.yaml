@@ -36,8 +36,10 @@ jobs:
           message="${{ github.actor }} ${{ github.event.action }} ${{ github.event.pull_request._links.html.href }}"
           echo "${message}"
           git fetch
-    
-          initial_commit=$(curl ${{ github.event.pull_request._links.commits }} | grep data-url | grep /commits_list_item | head -1 | awk -F/ '{print $5}')
+
+          echo ${{ github.event.pull_request._links.commits.href }} 
+          initial_commit=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].sha -r)
+          #initial_commit=$(curl ${{ github.event.pull_request._links.commits.href }} | grep data-url | grep /commits_list_item | head -1 | awk -F/ '{print $5}')
           task=$(git log -n 1 ${initial_commit} | grep "^    Bug: T[0-9]*$" | head -1 | awk '{print $2}')
           #task=$(git log origin/main..origin/${{ github.head_ref }} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
           #echo 1
