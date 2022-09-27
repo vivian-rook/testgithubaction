@@ -4,7 +4,7 @@ name: "PR Notification"
 
 'on':
   pull_request:
-    types: [opened, closed]
+#    types: [opened, closed]
 
 jobs:
   printJob:    
@@ -31,16 +31,20 @@ jobs:
     name: Comment on Phabricator
     steps:
       - uses: actions/checkout@v2
-      - name: post to phabricator
-
+      - name: generate message
         run: |
           message="${{ github.actor }} ${{ github.event.action }} ${{ github.event.pull_request._links.html.href }}"
-          git fetch
+          echo "${message}"
+      - name: git fetch
+        run: git fetch
+      - name: get task id on open
+        run: |
+          echo "on open"
           #inital_commit=$(git log origin/main..origin/${{ github.head_ref }} --pretty=%H | tail -n1)
           #task=$(git log -n 1 ${inital_commit} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
           task=$(git log origin/main..origin/${{ github.head_ref }} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
-          git log origin/main..origin/${{ github.head_ref }} 
-          echo "$task done ${{ github.head_ref }}"
+          #git log origin/main..origin/${{ github.head_ref }} 
+          #echo "$task done ${{ github.head_ref }}"
           #echo "$task and $inital_commit done"
           #echo "head ref ${{ github.head_ref }}"
           # if already squashed and merged use the branch name.
@@ -54,3 +58,11 @@ jobs:
           #      -d transactions[0][value]="${message}" \
           #      -d objectIdentifier=${task}
           #fi
+        if: github.event.action == 'opened' 
+      - name: get task id on close
+        run: |
+          task=$(git log --grep='#(${{ github.event.number }})' | grep "^    Bug: T[0-9]*$" | head -1 | awk '{print $2}')
+        #if: github.event.action == 'closed'
+      - name: comment on phabricator
+        run: |
+          echo "task: ${taxk} message: ${message}
