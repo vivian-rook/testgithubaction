@@ -38,7 +38,13 @@ jobs:
           git fetch
 
           echo ${{ github.event.pull_request._links.commits.href }} 
-          initial_commit=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].commit.message -r | grep "Bug: T[0-9]*$" | head -1 | awk '{print $2}')
+          print=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].commit.message -r)
+          echo -e ${print}
+          print2=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].commit.message -r | grep "Bug: T[0-9]*$")
+          echo -e ${print2}
+          print3=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].commit.message -r | grep "Bug: T[0-9]*$" | head -1 | awk '{print $2}')
+          echo -e ${print3}
+          task=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].commit.message -r | grep "^Bug: T[0-9]*$" | head -1 | awk '{print $2}')
           #initial_commit=$(curl ${{ github.event.pull_request._links.commits.href }} | jq .[0].commit.message -r)
           #initial_commit=$(curl ${{ github.event.pull_request._links.commits.href }} | grep data-url | grep /commits_list_item | head -1 | awk -F/ '{print $5}')
           #task=$(git log -n 1 ${initial_commit} | grep "^    Bug: T[0-9]*$" | head -1 | awk '{print $2}')
