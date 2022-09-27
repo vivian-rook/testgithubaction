@@ -4,18 +4,18 @@ name: "PR Notification"
 
 'on':
   pull_request:
-    types: [opened, closed]
+#    types: [opened, closed]
 
 jobs:
-  printJob:    
-    name: Print event
-    runs-on: ubuntu-latest
-    steps:
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: |
-        echo "$GITHUB_CONTEXT"
+#  printJob:    
+#    name: Print event
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Dump GitHub context
+#      env:
+#        GITHUB_CONTEXT: ${{ toJson(github) }}
+#      run: |
+#        echo "$GITHUB_CONTEXT"
 #  irc-notification:
 #    runs-on: ubuntu-latest
 #    name: Notify on IRC
@@ -31,22 +31,30 @@ jobs:
     name: Comment on Phabricator
     steps:
       - uses: actions/checkout@v2
-      - name: post to phabricator
-
+      - name: generate message
         run: |
           message="${{ github.actor }} ${{ github.event.action }} ${{ github.event.pull_request._links.html.href }}"
+          echo "${message}"
           git fetch
-          #inital_commit=$(git log origin/main..origin/${{ github.head_ref }} --pretty=%H | tail -n1)
-          #task=$(git log -n 1 ${inital_commit} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
+
           task=$(git log origin/main..origin/${{ github.head_ref }} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
-          git log origin/main..origin/${{ github.head_ref }} 
-          echo "$task done ${{ github.head_ref }}"
-          #echo "$task and $inital_commit done"
-          #echo "head ref ${{ github.head_ref }}"
-          # if already squashed and merged use the branch name.
-          #if [ -z "${task}" ]; then
-          #  task=$(git log -n 1 origin/${{ github.head_ref }} | tail -n1 | grep "^    Bug: T[0-9]*$" | awk '{print $2}')
-          #fi
+          echo 1
+          if [ -z "${task}" ]; then
+            echo 2
+            commit=$(git log --grep='#(${{ github.event.number }})')
+            commits=$(echo $commit | grep ^commit | wc -l)
+            # this test is not perfect, as potentially someone could put a (#<number>) string that matches
+            # The test below should avoid false positives
+            # The code could be improved by explicitly looking at the fifth line of the resulting commits
+            if [ "${commits}" -gt 1 ]; then
+              echo "more than 1 commit found, something is strange."
+              exit 1
+            elif [ "${commits}" -lt 1 ]; then
+              echo "less than 1 commit found, something is strange."
+              exit 1
+            fi
+            task=$(echo ${commit} | grep "^    Bug: T[0-9]*$" | head -1 | awk '{print $2}')
+          fi
           #if [ -n "${task}" ]; then
           #  curl https://phabricator.wikimedia.org/api/maniphest.edit \
           #      -d api.token=${{ secrets.TOOLFORGE_PHAB_BOT_KEY }} \
@@ -54,3 +62,4 @@ jobs:
           #      -d transactions[0][value]="${message}" \
           #      -d objectIdentifier=${task}
           #fi
+          echo "task: ${task} message: ${message}"
