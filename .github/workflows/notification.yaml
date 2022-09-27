@@ -65,4 +65,4 @@ jobs:
         #if: github.event.action == 'closed'
       - name: comment on phabricator
         run: |
-          echo "task: ${taxk} message: ${message}
+          echo "task: ${taxk} message: ${message}"
